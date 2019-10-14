@@ -48,8 +48,7 @@ echo Bootstrapping...
 
 command_exists pip || {
     # install pip
-    wget -q https://bootstrap.pypa.io/get-pip.py -O get-pip.py
-    python get-pip.py --user
+    wget -q https://bootstrap.pypa.io/get-pip.py -O- | python - --user
 }
 
 command_exists ansible || {
