@@ -55,3 +55,8 @@ command_exists ansible || {
     # install ansible
     pip install --user ansible
 }
+
+git clone https://github.com/axxie/dotfiles.git ~/.dotfiles
+
+cd ~/.dotfiles
+ansible-playbook -i hosts local_env.yml --ask-become-pass

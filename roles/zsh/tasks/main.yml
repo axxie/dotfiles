@@ -1,0 +1,19 @@
+- name: Make sure zsh is installed
+  package: name=zsh state=present
+  become_method: sudo
+  become: yes
+
+- name: Check if .oh-my-zsh already exists
+  stat: path="{{ ansible_env.HOME }}/.oh-my-zsh"
+  register: oh_my_zsh_stat
+
+- name: Download oh-my-zsh install script
+  get_url: 
+    url: https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+    mode: 0755
+    dest: /tmp/
+  when: oh_my_zsh_stat.stat.exists==false
+
+- name: Execute oh-my-zsh install script
+  shell: /tmp/install.sh
+  when: oh_my_zsh_stat.stat.exists==false

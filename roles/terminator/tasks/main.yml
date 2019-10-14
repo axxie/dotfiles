@@ -1,0 +1,24 @@
+- name: Install terminator
+  package: name=terminator state=present
+  become_method: sudo
+  become: yes
+
+- name: Install font
+  get_url: 
+    url: https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/FiraCode/Medium/complete/Fura%20Code%20Medium%20Nerd%20Font%20Complete%20Mono.ttf
+    mode: 0644
+    owner: root
+    group: root
+    dest: /usr/local/share/fonts
+  become: yes
+  register: font_installed
+
+- name: Refresh font cache
+  shell: fc-cache -f -v
+  when: font_installed.changed
+
+- name: Link terminator config
+  file:
+    src: "{{ dotfiles_home }}/roles/terminator/files/config"
+    dest: "{{ ansible_env.HOME }}/.config/terminator/config"
+    state: link
