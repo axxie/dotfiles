@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+# make sure user-specific bin is added to path
+PATH="$HOME/.local/bin:$PATH"
+
 command_exists() {
     command -v "$@" >/dev/null 2>&1
 }
@@ -48,10 +51,6 @@ command_exists pip || {
     wget -q https://bootstrap.pypa.io/get-pip.py -O get-pip.py
     python get-pip.py --user
 }
-
-# make sure user-specific bin is added to path
-. ~/.profile
-
 
 command_exists ansible || {
     # install ansible
