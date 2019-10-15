@@ -17,8 +17,15 @@
   shell: fc-cache -f -v
   when: font_installed.changed
 
-- name: Link terminator config
-  file:
-    src: "{{ dotfiles_home }}/roles/terminator/files/config"
-    dest: "{{ ansible_env.HOME }}/.config/terminator/config"
-    state: link
+- block:
+  - name: Make sure path exists
+    file:
+      dest: "{{ conf_path }}"
+      state: directory
+  - name: Link terminator config
+    file:
+      src: "{{ dotfiles_home }}/roles/terminator/files/config"
+      dest: "{{ conf_path }}/config"
+      state: link
+  vars:
+    conf_path: "{{ ansible_env.HOME }}/.config/terminator"
