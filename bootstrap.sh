@@ -57,7 +57,13 @@ command_exists ansible || {
     pip install --user ansible
 }
 
-git clone https://github.com/axxie/dotfiles.git ~/.dotfiles
 
-cd ~/.dotfiles
+if [ -d ~/.dotfiles ]; then
+    cd ~/.dotfiles
+    git pull
+else
+    git clone https://github.com/axxie/dotfiles.git ~/.dotfiles
+    cd ~/.dotfiles
+fi
+
 ansible-playbook -i hosts local_env.yml --ask-become-pass
