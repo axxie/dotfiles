@@ -1,4 +1,5 @@
 #!/bin/sh -e
+set -e
 
 # make sure user-specific bin is added to path
 PATH="$HOME/.local/bin:$PATH"
