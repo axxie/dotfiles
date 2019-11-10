@@ -1,3 +1,14 @@
+- name: Check if apt-cache is available
+  shell: command -v apt-cache
+  failed_when: no
+  changed_when: no
+  register: apt_cache
+
+- name: Fail if apt_cache is not available
+  fail:
+    msg: "apt-cache is not available on current system, cannot install zsh"
+  when: apt_cache.rc != 0
+
 - name: Get available zsh version
   shell: apt-cache madison zsh | cut -d\| -f2 | sort | tail -1 | xargs
   register: zsh_versions
