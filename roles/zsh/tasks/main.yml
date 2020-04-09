@@ -76,6 +76,24 @@
     line: "DEFAULT_USER={{ ansible_env.USER }}"
     create: yes
 
+- name: Check if zsh is available as a command
+  shell: command -v zsh
+  failed_when: no
+  changed_when: no
+  register: zsh
+
+- name: Fail if zsh is not available
+  fail:
+    msg: "zsh is not found after installation, failure"
+  when: zsh.rc != 0
+
+- name: Make zsh default shell
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: "{{ zsh.stdout_lines[0] }}"
+  become_method: sudo
+  become: yes
+
 - block:
 
   - name: Check if powerlevel10k already exists
