@@ -12,12 +12,12 @@
 - name: Get available zsh version
   shell: apt-cache madison zsh | cut -d\| -f2 | sort | tail -1 | xargs
   register: zsh_versions
+  changed_when: no
 
 - name: Fail if zsh is too old
   fail:
     msg: "A minimum zsh 5.1 must be available for installation. Zsh version available on current system: {{ zsh_versions.stdout_lines[0] }}"
   when: zsh_versions.stdout_lines[0] < "5.1"
-
 
 - name: Make sure zsh is installed
   package:
@@ -30,21 +30,22 @@
   stat: path="{{ ansible_env.HOME }}/.oh-my-zsh"
   register: oh_my_zsh_stat
 
-- name: Download oh-my-zsh install script
-  get_url: 
-    url: https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh
-    mode: 0755
-    dest: /tmp/
-  when: oh_my_zsh_stat.stat.exists==false
+- name: Install oh-my-zsh
+  block:
+  - name: Download oh-my-zsh install script
+    get_url: 
+      url: https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+      mode: 0755
+      dest: /tmp/
 
-- name: Execute oh-my-zsh install script
-  shell: /tmp/install.sh
-  when: oh_my_zsh_stat.stat.exists==false
+  - name: Execute oh-my-zsh install script
+    shell: /tmp/install.sh
 
-- name: Delete oh-my-zsh install script
-  file:
-    dest: "/tmp/install.sh"
-    state: absent
+  always:
+  - name: Delete oh-my-zsh install script
+    file:
+      dest: "/tmp/install.sh"
+      state: absent
   when: oh_my_zsh_stat.stat.exists==false
 
 - name: Configure theme in .zshrc
@@ -58,7 +59,6 @@
     path: "{{ ansible_env.HOME }}/.zshrc"
     regexp: 'plugins=.*$'
     replace: 'plugins=(git vagrant vagrant-prompt)'
-
 
 - name: Configure .zshrc
   blockinfile:
@@ -94,25 +94,14 @@
   become_method: sudo
   become: yes
 
-- block:
+- name: Install powerlevel10k
+  git:
+    repo: https://github.com/romkatv/powerlevel10k.git
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/powerlevel10k"
+    depth: 1
 
-  - name: Check if powerlevel10k already exists
-    stat: path="{{ p10k_path }}"
-    register: p10k_stat
-
-  - name: Install powerlevel10k
-    git:
-      repo: https://github.com/romkatv/powerlevel10k.git
-      dest: "{{ p10k_path }}"
-      depth: 1
-    when: p10k_stat.stat.exists==false
-
-  - name: Install powerlevel10k config
-    file:
-      src: "{{ dotfiles_home }}/roles/zsh/files/.p10k.zsh"
-      dest: "{{ ansible_env.HOME }}/.p10k.zsh"
-      state: link
-    when: p10k_stat.stat.exists==false
-
-  vars:
-    p10k_path: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/powerlevel10k"
+- name: Install powerlevel10k config
+  file:
+    src: "{{ dotfiles_home }}/roles/zsh/files/.p10k.zsh"
+    dest: "{{ ansible_env.HOME }}/.p10k.zsh"
+    state: link

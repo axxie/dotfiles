@@ -15,7 +15,7 @@
 
 - name: Refresh font cache
   shell: fc-cache -f -v
-  when: font_installed.changed
+  when: font_installed is changed
 
 - block:
   - name: Make sure path exists
