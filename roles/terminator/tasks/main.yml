@@ -29,3 +29,8 @@
       state: link
   vars:
     conf_path: "{{ ansible_env.HOME }}/.config/terminator"
+
+
+- name: Add terminator to Gnome Favorites (Dock)
+  gnome_favorites.py:
+    app: 'terminator.desktop'
