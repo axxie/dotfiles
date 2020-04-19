@@ -3,6 +3,7 @@
 
 
 from __future__ import absolute_import, division, print_function
+import subprocess
 
 __metaclass__ = type
 
@@ -43,10 +44,42 @@ class DBusWrapper(object):
         if self.dbus_session_bus_address is None:
             self.module.get_bin_path('dbus-run-session', required=True)
 
+    def _check_output_strip(self, command):
+        return subprocess.check_output(command).decode('utf-8').strip()
+    
+    def _get_gnome_version(self):
+        return tuple(map(int, (self._check_output_strip(
+            ['gnome-shell', '--version']).split(' ')[2].split('.'))))
+
+    def _get_dbus_bus_address_no_psutil(self, uid):
+        user = str(uid)
+        pgrep_cmd = ['pgrep', '-u', user, 'gnome-session']
+        gnome_ver = self._get_gnome_version()
+        if (gnome_ver >= (3, 33, 90)):
+            # From GNOME 3.33.90 session process has changed
+            # https://github.com/GNOME/gnome-session/releases/tag/3.33.90
+            pgrep_cmd = ['pgrep', '-u', user, '-f', 'session=gnome']
+
+        try:
+            pid = self._check_output_strip(pgrep_cmd)
+        except subprocess.CalledProcessError:
+           return None
+
+        if pid:
+            env_var = self._check_output_strip(
+                ['grep', '-z', '^DBUS_SESSION_BUS_ADDRESS',
+                 '/proc/{}/environ'.format(pid)]).strip('\0')
+            env_var_split = env_var.split('=', 1)
+
+            if len(env_var_split) > 1:
+                return env_var_split[1]
+
     def _get_existing_dbus_session(self):
         uid = os.getuid()
 
         self.module.debug("Trying to detect existing D-Bus user session for user: %d" % uid)
+        if not psutil_found:
+            return self._get_dbus_bus_address_no_psutil(uid)
 
         for pid in psutil.pids():
             process = psutil.Process(pid)
@@ -106,7 +139,7 @@ class FavoritesPreference(object):
         if rc != 0:
             self.module.fail_json(msg='gsettings failed while getting the value with error: %s' % err)
 
-        return map(lambda x: x.strip(" \'\""), out.strip('[]\n').split(','))
+        return list(map(lambda x: x.strip(" \'\""), out.strip('[]\n').split(',')))
 
     def _set(self, favorites):
         favorites_string = "[" + ",".join(map(lambda x: "'" + x + "'", favorites)) + "]"
@@ -146,9 +179,6 @@ def main():
         ),
         supports_check_mode=True
     )
-
-    if not psutil_found:
-        module.fail_json(msg=missing_required_lib("psutil"), exception=PSUTIL_IMP_ERR)
 
     # Create wrapper instance.
     preference = FavoritesPreference(module, module.check_mode)

@@ -33,7 +33,27 @@ setup_color() {
 
 setup_color
 
-for command in wget python git
+# The only cross-shell way to ask password
+echo -n "Enter password: "
+old_stty_cfg=$(stty -g)
+stty -echo ; PASSWORD=$(head -n 1) ; stty $old_stty_cfg
+echo ""
+
+# Check password and sudo
+if ! printf '%s\n' "$PASSWORD" | sudo -kS true >/dev/null 2>&1 ; then
+    error "'sudo' command failed with supplied password"
+    exit 1
+fi
+
+OS_VERSION=$(grep -oP 'VERSION_ID="\K\d+' /etc/os-release)
+
+if [ $OS_VERSION -lt 16 ]; then
+    PYTHON=python
+else
+    PYTHON=python3
+fi
+
+for command in wget $PYTHON git
 do
     command_exists "$command" || {
         error "Required command \"$command\" is not installed"
@@ -47,14 +67,23 @@ fi
 
 echo Bootstrapping...
 
-command_exists pip || {
+# For Ubuntu 18 python3-distutils must be installed to be able to use pip from python3
+if [ $OS_VERSION -ge 18 ]; then
+    $PYTHON -c "import distutils.util" >/dev/null 2>&1 || {
+        echo "Installing python3-distutils..."
+        printf '%s\n' "$PASSWORD" | sudo -S apt-get install -y python3-distutils
+    }
+fi
+
+
+$PYTHON -c "import pip" >/dev/null 2>&1 || {
     # install pip
-    wget -q https://bootstrap.pypa.io/get-pip.py -O- | python - --user
+    wget -q https://bootstrap.pypa.io/get-pip.py -O- | $PYTHON - --user
 }
 
 command_exists ansible || {
     # install ansible
-    pip install --user ansible
+    $PYTHON -m pip install --user ansible
 }
 
 
@@ -66,4 +95,4 @@ else
     cd ~/.dotfiles
 fi
 
-ansible-playbook -i hosts local_env.yml --ask-become-pass
+ansible-playbook -i hosts local_env.yml --extra-vars "ansible_sudo_pass=$PASSWORD ansible_python_interpreter=auto" 
