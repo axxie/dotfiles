@@ -1,15 +1,17 @@
 [global_config]
 [keybindings]
-[profiles]
-  [[default]]
-    use_system_font = False
-    font = FuraCode Nerd Font Mono Medium 11
 [layouts]
   [[default]]
     [[[child1]]]
-      type = Terminal
       parent = window0
+      type = Terminal
     [[[window0]]]
-      type = Window
       parent = ""
+      type = Window
 [plugins]
+[profiles]
+  [[default]]
+    cursor_color = "#aaaaaa"
+    font = FuraCode Nerd Font Mono Medium 11
+    scrollback_infinite = True
+    use_system_font = False
