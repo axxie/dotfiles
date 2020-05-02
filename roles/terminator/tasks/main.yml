@@ -11,11 +11,15 @@
     group: root
     dest: /usr/local/share/fonts
   become: yes
-  register: font_installed
+
+- name: Check if font already cached
+  shell: fc-list ":family=FuraCode Nerd Font Mono"
+  register: fc_list
+  changed_when: no
 
 - name: Refresh font cache
   shell: fc-cache -f -v
-  when: font_installed is changed
+  when: "'FuraCode Nerd Font Mono' not in fc_list.stdout"
 
 - block:
   - name: Make sure path exists
