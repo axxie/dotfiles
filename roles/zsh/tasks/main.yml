@@ -72,9 +72,9 @@
   blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     block: |
-      [[ -f ~/.zshrc_local ]] && source ~/.zshrc_local
       # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
       [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+      [[ -f ~/.zshrc_local ]] && source ~/.zshrc_local
 
 - name: Create host-specific (local) zsh settings
   lineinfile:
