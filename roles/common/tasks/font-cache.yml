@@ -1,0 +1,10 @@
+- name: Check if font already cached
+  shell: fc-list ":family={{ font }}"
+  register: fc_list
+  changed_when: no
+
+- name: Refresh font cache
+  shell: fc-cache -f -v
+  when: "font not in fc_list.stdout"
+  become_method: sudo
+  become: yes

@@ -12,14 +12,12 @@
     dest: /usr/local/share/fonts
   become: yes
 
-- name: Check if font already cached
-  shell: fc-list ":family=FuraCode Nerd Font Mono"
-  register: fc_list
-  changed_when: no
-
 - name: Refresh font cache
-  shell: fc-cache -f -v
-  when: "'FuraCode Nerd Font Mono' not in fc_list.stdout"
+  import_role: 
+    name: common
+    tasks_from: font-cache.yml
+  vars:
+    font: FuraCode Nerd Font Mono
 
 - block:
   - name: Make sure path exists
