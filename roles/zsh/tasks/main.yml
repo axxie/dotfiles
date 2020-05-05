@@ -58,7 +58,7 @@
   replace:
     path: "{{ ansible_env.HOME }}/.zshrc"
     regexp: 'plugins=.*$'
-    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip)'
+    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec)'
 
 - name: Configure .zshrc - disable warning for root
   blockinfile:
@@ -145,3 +145,14 @@
     state: link
   become_method: sudo
   become: yes
+
+- name: Create docker-exec directory
+  file:
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/docker-exec/"
+    state: directory
+
+- name: Install docker-exec completion
+  file:
+    src: "{{ role_path }}/files/docker-exec.plugin.zsh"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/docker-exec/docker-exec.plugin.zsh"
+    state: link
