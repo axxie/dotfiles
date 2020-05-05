@@ -82,6 +82,6 @@
 
 - name: Configure font
   file:
-    src: "{{ dotfiles_home }}/roles/far2l/files/.config/far2l/font"
+    src: "{{ role_path }}/files/.config/far2l/font"
     dest: "{{ ansible_env.HOME }}/.config/far2l/font"
     state: link

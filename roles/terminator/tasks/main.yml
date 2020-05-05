@@ -26,7 +26,7 @@
       state: directory
   - name: Link terminator config
     file:
-      src: "{{ dotfiles_home }}/roles/terminator/files/config"
+      src: "{{ role_path }}/files/config"
       dest: "{{ conf_path }}/config"
       state: link
   vars:

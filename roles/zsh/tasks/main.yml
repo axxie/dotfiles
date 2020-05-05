@@ -134,13 +134,13 @@
 
 - name: Install powerlevel10k config
   file:
-    src: "{{ dotfiles_home }}/roles/zsh/files/.p10k.zsh"
+    src: "{{ role_path }}/files/.p10k.zsh"
     dest: "{{ ansible_env.HOME }}/.p10k.zsh"
     state: link
 
 - name: Install powerlevel10k config for root
   file:
-    src: "{{ dotfiles_home }}/roles/zsh/files/.p10k.zsh"
+    src: "{{ role_path }}/files/.p10k.zsh"
     dest: "{{ root_home }}/.p10k.zsh"
     state: link
   become_method: sudo
