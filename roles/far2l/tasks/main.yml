@@ -62,7 +62,7 @@
 
 - name: Install font
   copy:
-    src: TerminalVector.ttf
+    src: font/TerminalVector.ttf
     dest: /usr/local/share/fonts/
   become_method: sudo
   become: yes
@@ -82,6 +82,6 @@
 
 - name: Configure font
   file:
-    src: "{{ role_path }}/files/font"
+    src: "{{ dotfiles_home }}/roles/far2l/files/.config/far2l/font"
     dest: "{{ ansible_env.HOME }}/.config/far2l/font"
     state: link
