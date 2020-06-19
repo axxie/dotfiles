@@ -1,0 +1,3 @@
+Sequence
+SZ
+$If (!Selected) CtrlRight CtrlLeft CtrlShiftRight $End %t=Editor.SelValue; F7 %a=dlg.getvalue(7,0); $if (%a==1) AltV $end %b=dlg.getvalue(6,0); $if (%b==0) AltW $end %c=dlg.getvalue(9,0); $if (%c==0) AltL $end AltS CtrlY CtrlY $Text %t Enter\0

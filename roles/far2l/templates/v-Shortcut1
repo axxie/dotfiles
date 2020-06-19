@@ -1,0 +1,3 @@
+Shortcut1
+SZ
+{{ ansible_env.HOME }}\0

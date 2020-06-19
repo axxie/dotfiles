@@ -74,9 +74,9 @@
   vars:
     font: TerminalVector
 
-- name: Ensure configure dir is present
+- name: Ensure configure dirs are present
   file:
-    path: "{{ ansible_env.HOME }}/.config/far2l/"
+    path: "{{ ansible_env.HOME }}/.config/far2l/REG"
     state: directory
     recurse: yes
 
@@ -88,6 +88,17 @@
   with_items:
     - font
     - palette.ini
+
+- name: Link registry settings
+  file:
+    src: "{{ role_path }}/files/.config/far2l/REG/HKU"
+    dest: "{{ ansible_env.HOME }}/.config/far2l/REG/HKU"
+    state: link
+
+- name: Configure folder shortcut
+  template:
+    src: ./templates/v-Shortcut1
+    dest: "{{ ansible_env.HOME }}/.config/far2l/REG/HKU/c/k-Software/k-Far2/k-FolderShortcuts/v-Shortcut1"
 
 - name: Link colorer scheme
   file:
