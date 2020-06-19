@@ -24,48 +24,38 @@ except ImportError:
     sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'module_utils'))
     from dbuswrapper import DBusWrapper
 
-FAVORITES_ARGS = ["org.gnome.shell", "favorite-apps"]
 
-
-class FavoritesPreference(object):
+class Gsetting(object):
 
     def __init__(self, module, check_mode=False):
         self.module = module
         self.check_mode = check_mode
 
-    def _get(self):
+    def _get(self, path, key):
 
-        command = ["gsettings", "get"] + FAVORITES_ARGS
-        rc, out, err = self.module.run_command(command)
+        rc, out, err = self.module.run_command(["gsettings", "get", path, key])
         if rc != 0:
             self.module.fail_json(msg='gsettings failed while getting the value with error: %s' % err)
 
-        return list(map(lambda x: x.strip(" \'\""), out.strip('[]\n').split(',')))
+        return out.strip('\n')
 
-    def _set(self, favorites):
-        favorites_string = "[" + ",".join(map(lambda x: "'" + x + "'", favorites)) + "]"
-        command = ["gsettings", "set"] + FAVORITES_ARGS + [ favorites_string ]
-
+    def _set(self, path, key, value):
         # Run the command and fetch standard return code, stdout, and stderr.
         dbus_wrapper = DBusWrapper(self.module)
-        rc, out, err = dbus_wrapper.run_command(command)
+        rc, out, err = dbus_wrapper.run_command(["gsettings", "set", path, key, value])
         if rc != 0:
             self.module.fail_json(msg='gsettings failed while setting the value with error: %s' % err)
 
-    def update(self, callback):
+    def set(self, path, key, value):
 
-        favorites = self._get()
-        # new_favorites = favorites[:] # copy favorites
-        # callback(new_favorites) # mutate copied version
+        current_value = self._get(path, key)
 
-        new_favorites = callback(favorites)
-
-        if new_favorites == favorites:
+        if current_value == value:
             return False
         elif self.check_mode:
             return True
 
-        self._set(new_favorites)
+        self._set(path, key, value)
 
         # Value was changed.
         return True
@@ -75,23 +65,18 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent']),
-            app=dict(required=True, type='str'),
+            path=dict(required=True, type='str'),
+            key=dict(required=True, type='str'),
+            value=dict(required=True, type='str'),
         ),
         supports_check_mode=True
     )
 
     # Create wrapper instance.
-    preference = FavoritesPreference(module, module.check_mode)
+    setting = Gsetting(module, module.check_mode)
 
-    # Process based on different states.
-    app = module.params['app']
-    if module.params['state'] == 'present':
-        changed = preference.update(lambda favorites: favorites if app in favorites else favorites + [app])
-        module.exit_json(changed=changed)
-    elif module.params['state'] == 'absent':
-        changed = preference.update(lambda favorites: [x for x in favorites if x != app])
-        module.exit_json(changed=changed)
+    changed = setting.set(module.params['path'], module.params['key'], module.params['value'])
+    module.exit_json(changed=changed)
 
 
 if __name__ == '__main__':

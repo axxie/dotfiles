@@ -106,3 +106,19 @@
       </hrd>
   become_method: sudo
   become: yes
+
+- name: Disable Gnome shortcuts
+  gsetting.py:
+    path: org.gnome.desktop.wm.keybindings
+    key: "{{ item }}"
+    value: "['disabled']"
+  with_items:
+    - panel-main-menu
+    - panel-run-dialog
+    - switch-to-workspace-down
+    - switch-to-workspace-up
+    - cycle-group-backward
+    - begin-move
+    - toggle-maximized
+    - begin-resize
+    - cycle-group
