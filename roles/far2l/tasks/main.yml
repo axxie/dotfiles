@@ -80,8 +80,12 @@
     state: directory
     recurse: yes
 
-- name: Configure font
+- name: Link font and palette
   file:
-    src: "{{ role_path }}/files/.config/far2l/font"
-    dest: "{{ ansible_env.HOME }}/.config/far2l/font"
+    src: "{{ role_path }}/files/.config/far2l/{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.config/far2l/{{ item }}"
     state: link
+  with_items:
+    - font
+    - palette.ini
+
