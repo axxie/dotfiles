@@ -65,7 +65,7 @@
   replace:
     path: "{{ ansible_env.HOME }}/.zshrc"
     regexp: 'plugins=.*$'
-    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting)'
+    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools)'
 
 - name: Configure .zshrc - disable warning for root
   blockinfile:
