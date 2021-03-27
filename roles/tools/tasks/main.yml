@@ -1,0 +1,24 @@
+- name: Install tools via apt
+  package:
+    name:
+     - iftop
+    state: present
+  become_method: sudo
+  become: yes
+
+- name: Install pip
+  package:
+    name:
+     - python3-pip
+    state: present
+  become_method: sudo
+  become: yes
+
+
+- name: Install python tools
+  pip:
+    executable: pip3
+    name:
+     - bpytop
+  become_method: sudo
+  become: yes
