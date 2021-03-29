@@ -12,6 +12,11 @@
      - libneon27-dev
      - cmake
      - g++
+     - libpcre2-dev
+     - libxerces-c-dev
+     - libspdlog-dev
+     - libuchardet-dev
+     - libarchive-dev
     state: present
   become_method: sudo
   become: yes
