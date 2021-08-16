@@ -1,65 +1,17 @@
-- name: Install prerequisites
+- name: Add far2l ppa
+  apt_repository:
+    repo: ppa:far2l-team/ppa
+  when: ansible_os_family == 'Debian'
+  become_method: sudo
+  become: yes
+
+- name: Install far2l
   package:
-    name:
-     - gawk
-     - m4
-     - libglib2.0-dev
-     - libwxgtk3.0-dev
-     - libssh-dev
-     - libssl-dev
-     - libsmbclient-dev
-     - libnfs-dev
-     - libneon27-dev
-     - cmake
-     - g++
-     - libpcre2-dev
-     - libxerces-c-dev
-     - libspdlog-dev
-     - libuchardet-dev
-     - libarchive-dev
+    name: far2l
     state: present
+  when: ansible_os_family == 'Debian'
   become_method: sudo
   become: yes
-
-- name: Download far2l sources
-  git:
-    repo: https://github.com/elfmz/far2l
-    dest: "/usr/local/src/far2l"
-    depth: 1
-  become_method: sudo
-  become: yes
-  register: source_update
-
-- name: Create build directory
-  file:
-    path: "/usr/local/src/far2l/build"
-    state: directory
-  become_method: sudo
-  become: yes
-
-- name: Create makefiles
-  shell: "cmake -DUSEWX=yes -DCMAKE_BUILD_TYPE=Release .."
-  args:
-    chdir: "/usr/local/src/far2l/build"
-  become_method: sudo
-  become: yes
-  when: source_update.changed
-
-- name: Build
-  shell: "make -j{{ ansible_processor_vcpus }}"
-  args:
-    chdir: "/usr/local/src/far2l/build"
-  become_method: sudo
-  become: yes
-  when: source_update.changed
-
-- name: Install
-  shell: "make install"
-  args:
-    chdir: "/usr/local/src/far2l/build"
-  become_method: sudo
-  become: yes
-  when: source_update.changed
 
 - name: Add far to Gnome Favorites (Dock)
   gnome_favorites.py:
@@ -113,18 +65,20 @@
 - name: Link colorer scheme
   file:
     src: "{{ role_path }}/files/colorer-hrd/axxie.hrd"
-    dest: "/usr/local/share/far2l/Plugins/colorer/base/hrd/console/axxie.hrd"
+    dest: "/usr/lib/far2l/Plugins/colorer/base/hrd/console/axxie.hrd"
     state: link
+  when: ansible_os_family == 'Debian'
   become_method: sudo
   become: yes
 
 - name: Configure color scheme
   blockinfile:
-    path: "/usr/local/share/far2l/Plugins/colorer/base/hrd/catalog-console.xml"
+    path: "/usr/lib/far2l/Plugins/colorer/base/hrd/catalog-console.xml"
     block: |
       <hrd class="console" name="Axxie" description="Axxie">
         <location link="&hrd;/console/axxie.hrd"/>
       </hrd>
+  when: ansible_os_family == 'Debian'
   become_method: sudo
   become: yes
 
