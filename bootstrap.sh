@@ -91,8 +91,8 @@ if [ -d ~/.dotfiles ]; then
     cd ~/.dotfiles
     git pull
 else
-    git clone https://github.com/axxie/dotfiles.git ~/.dotfiles
+    git clone https://github.com/axxie/dotfiles.git -b far-from-ppa ~/.dotfiles
     cd ~/.dotfiles
 fi
 
-ansible-playbook -i hosts local_env.yml --extra-vars "ansible_sudo_pass=$PASSWORD ansible_python_interpreter=auto" 
+ansible-playbook -i hosts local_env.yml --extra-vars "ansible_sudo_pass=$PASSWORD ansible_python_interpreter=auto"

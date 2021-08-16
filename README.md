@@ -1,7 +1,7 @@
 # Installation
 
 ```bash
-sh -c "$(wget -q -O- https://raw.githubusercontent.com/axxie/dotfiles/master/bootstrap.sh)"
+sh -c "$(wget -q -O- https://raw.githubusercontent.com/axxie/dotfiles/far-from-ppa/bootstrap.sh)"
 ```
 
 
