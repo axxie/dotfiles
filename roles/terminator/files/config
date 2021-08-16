@@ -1,5 +1,12 @@
 [global_config]
 [keybindings]
+  help = None
+[profiles]
+  [[default]]
+    cursor_color = "#aaaaaa"
+    font = FiraCode Nerd Font Mono Regular 11
+    scrollback_infinite = True
+    use_system_font = False
 [layouts]
   [[default]]
     [[[child1]]]
@@ -9,9 +16,3 @@
       parent = ""
       type = Window
 [plugins]
-[profiles]
-  [[default]]
-    cursor_color = "#aaaaaa"
-    font = FuraCode Nerd Font Mono Medium 11
-    scrollback_infinite = True
-    use_system_font = False

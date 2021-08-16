@@ -17,7 +17,7 @@
     name: common
     tasks_from: font-cache.yml
   vars:
-    font: FuraCode Nerd Font Mono
+    font: FiraCode Nerd Font Mono Regular
 
 - block:
   - name: Make sure path exists
