@@ -33,11 +33,14 @@
 
 - name: Ensure configure dirs are present
   file:
-    path: "{{ ansible_env.HOME }}/.config/far2l/REG"
+    path: "{{ ansible_env.HOME }}/.config/far2l/{{ item }}"
     state: directory
     recurse: yes
+  with_items:
+    - settings
+    - plugins
 
-- name: Link font and palette
+- name: Link settings
   file:
     src: "{{ role_path }}/files/.config/far2l/{{ item }}"
     dest: "{{ ansible_env.HOME }}/.config/far2l/{{ item }}"
@@ -45,22 +48,15 @@
   with_items:
     - font
     - palette.ini
-
-- name: Link registry settings
-  file:
-    src: "{{ role_path }}/files/.config/far2l/REG/HKU"
-    dest: "{{ ansible_env.HOME }}/.config/far2l/REG/HKU"
-    state: link
-
-- name: Create folder for folder shortcuts
-  file:
-    path: "{{ansible_env.HOME }}/.config/far2l/REG/HKU/c/k-Software/k-Far2/k-FolderShortcuts"
-    state: directory
+    - settings/config.ini
+    - settings/key_macros.ini
+    - plugins/align
+    - plugins/colorer
 
 - name: Configure folder shortcut
   template:
-    src: ./templates/v-Shortcut1
-    dest: "{{ ansible_env.HOME }}/.config/far2l/REG/HKU/c/k-Software/k-Far2/k-FolderShortcuts/v-Shortcut1"
+    src: ./templates/bookmarks.ini
+    dest: "{{ ansible_env.HOME }}/.config/far2l/settings/bookmarks.ini"
 
 - name: Link colorer scheme
   file:
