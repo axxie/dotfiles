@@ -77,8 +77,14 @@ fi
 
 
 $PYTHON -c "import pip" >/dev/null 2>&1 || {
-    # install pip
-    wget -q https://bootstrap.pypa.io/get-pip.py -O- | $PYTHON - --user
+    python_version=$($PYTHON -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')
+    if [ "$python_version" -lt "30" ]; then
+        wget -q https://bootstrap.pypa.io/pip/2.7/get-pip.py -O- | $PYTHON - --user
+    elif [ "$python_version" -lt "37" ]; then
+        wget -q https://bootstrap.pypa.io/pip/3.6/get-pip.py -O- | $PYTHON - --user
+    else
+        wget -q https://bootstrap.pypa.io/get-pip.py -O- | $PYTHON - --user
+    fi
 }
 
 command_exists ansible || {
