@@ -37,6 +37,7 @@
         repo: https://github.com/elfmz/far2l
         dest: "{{ build_path }}"
         depth: 1
+        force: true
 
     - name: Download jumpword sources
       git:
