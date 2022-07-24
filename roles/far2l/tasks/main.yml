@@ -13,6 +13,73 @@
   become_method: sudo
   become: yes
 
+- name: Install jumpword far2l plugin
+  vars:
+    build_path: "/tmp/far2l-sources"
+  block:
+    - name: Install prerequisites
+      package:
+        name:
+        - gawk
+        - m4
+        - cmake
+        - g++
+        - pkg-config
+        - libuchardet-dev
+        - libxerces-c-dev
+        - libspdlog-dev
+        state: present
+      become_method: sudo
+      become: yes
+
+    - name: Download far2l sources
+      git:
+        repo: https://github.com/elfmz/far2l
+        dest: "{{ build_path }}"
+        depth: 1
+
+    - name: Download jumpword sources
+      git:
+        repo: https://github.com/axxie/far2l-jumpword.git
+        dest: "{{ build_path }}/jumpword"
+        version: main
+        depth: 1
+
+    - name: Add jumpword to far2l CMakeLists.txt
+      lineinfile:
+        path: "{{ build_path }}/CMakeLists.txt"
+        line: "add_subdirectory(jumpword)"
+
+    - name: Create build directory
+      file:
+        path: "{{ build_path }}/build"
+        state: directory
+
+    - name: Create makefiles
+      shell: "cmake -DUSEWX=no -DCMAKE_BUILD_TYPE=Release .."
+      args:
+        chdir: "{{ build_path }}/build"
+      register: cmake_output        
+      changed_when: "'The C compiler identification is' in cmake_output.stdout"
+      
+    - name: Build
+      shell: "make -j{{ ansible_processor_vcpus }} jumpword"
+      args:
+        chdir: "{{ build_path }}/build"
+      register: build_output
+      changed_when: "'jumpword.far-plug-wide' in build_output.stdout"        
+
+    - name: Install
+      copy:
+        remote_src: true
+        src: "{{ build_path }}/build/install/Plugins/jumpword/plug"
+        dest: "/usr/lib/far2l/Plugins/jumpword/"
+        owner: root
+        group: root
+        mode: u=rwx,g=rx,o=rx
+      become_method: sudo
+      become: yes
+
 - name: Add far to Gnome Favorites (Dock)
   gnome_favorites.py:
     app: 'far2l.desktop'
