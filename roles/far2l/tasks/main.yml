@@ -129,7 +129,7 @@
 - name: Link colorer scheme
   file:
     src: "{{ role_path }}/files/colorer-hrd/axxie.hrd"
-    dest: "/usr/lib/far2l/Plugins/colorer/base/hrd/console/axxie.hrd"
+    dest: "/usr/share/far2l/Plugins/colorer/base/hrd/console/axxie.hrd"
     state: link
   when: ansible_os_family == 'Debian'
   become_method: sudo
@@ -137,7 +137,7 @@
 
 - name: Configure color scheme
   blockinfile:
-    path: "/usr/lib/far2l/Plugins/colorer/base/hrd/catalog-console.xml"
+    path: "/usr/share/far2l/Plugins/colorer/base/hrd/catalog-console.xml"
     block: |
       <hrd class="console" name="Axxie" description="Axxie">
         <location link="&hrd;/console/axxie.hrd"/>
