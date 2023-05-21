@@ -4,7 +4,7 @@
 [profiles]
   [[default]]
     cursor_color = "#aaaaaa"
-    font = FiraCode Nerd Font Mono Regular 11
+    font = FiraCode Nerd Font Regular 11
     scrollback_infinite = True
     use_system_font = False
 [layouts]

@@ -4,12 +4,10 @@
   become: yes
 
 - name: Install font
-  get_url: 
-    url: https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/patched-fonts/FiraCode/Regular/complete/Fira%20Code%20Regular%20Nerd%20Font%20Complete%20Mono.ttf
-    mode: 0644
-    owner: root
-    group: root
-    dest: /usr/local/share/fonts
+  copy:
+    src: FiraCodeNerdFont-Regular.ttf
+    dest: /usr/local/share/fonts/
+  become_method: sudo
   become: yes
 
 - name: Refresh font cache
@@ -17,7 +15,7 @@
     name: common
     tasks_from: font-cache.yml
   vars:
-    font: FiraCode Nerd Font Mono Regular
+    font: FiraCode Nerd Font Regular
 
 - block:
   - name: Make sure path exists
