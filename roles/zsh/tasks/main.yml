@@ -71,7 +71,7 @@
   replace:
     path: "{{ ansible_env.HOME }}/.zshrc"
     regexp: 'plugins=.*$'
-    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools zsh-z pexe)'
+    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools zsh-z pexe fzf)'
 
 - name: Configure .zshrc - disable warning for root
   blockinfile:
@@ -199,3 +199,26 @@
     src: "{{ role_path }}/files/pexe.plugin.zsh"
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/pexe/pexe.plugin.zsh"
     state: link
+
+- name: Download fzf repo
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: "{{ ansible_env.HOME }}/.fzf"
+    depth: 1
+    force: true
+
+- name: Run fzf install script
+  shell: "{{ ansible_env.HOME }}/.fzf/install --bin"
+  register: fzf_install_output
+  changed_when: "'Already exists' not in fzf_install_output.stdout"
+
+- name: Install fzf binary
+  copy:
+    src: "{{ ansible_env.HOME }}/.fzf/bin/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    mode: u=rwx,go=rx
+  become_method: sudo
+  become: yes
+  with_items:
+    - fzf
+    - fzf-tmux
