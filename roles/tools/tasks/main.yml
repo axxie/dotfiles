@@ -2,6 +2,7 @@
   package:
     name:
      - iftop
+     - bat
     state: present
   become_method: sudo
   become: yes
@@ -22,3 +23,21 @@
      - bpytop
   become_method: sudo
   become: yes
+
+- name: Link bat to batcat
+  file:
+    src: "/usr/bin/batcat"
+    dest: "/usr/bin/bat"
+    state: link
+  when: ansible_os_family == 'Debian'
+  become_method: sudo
+  become: yes
+
+- name: Set bat color theme and make it man page viewer
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    line: "{{ item }}"
+  with_items:    
+    - "export MANPAGER=\"sh -c 'col -bx | bat -l man -p'\""
+    - "export BAT_THEME=\"Visual Studio Dark+\""
+  

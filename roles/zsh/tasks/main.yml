@@ -54,7 +54,6 @@
     regexp: 'ZSH_THEME=.*$'
     replace: 'ZSH_THEME="powerlevel10k/powerlevel10k"'
 
-
 - name: Install zsh-syntax-highlighting
   git:
     repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
@@ -71,7 +70,7 @@
   replace:
     path: "{{ ansible_env.HOME }}/.zshrc"
     regexp: 'plugins=.*$'
-    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools zsh-z pexe fzf)'
+    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools zsh-z pexe fzf-settings fzf)'
 
 - name: Configure .zshrc - disable warning for root
   blockinfile:
@@ -114,6 +113,7 @@
       # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
       [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
       [[ -f ~/.zshrc_local ]] && source ~/.zshrc_local
+      [[ -f ~/.profile ]] && source ~/.profile
 
 - name: Create host-specific (local) zsh settings
   lineinfile:
@@ -198,6 +198,17 @@
   file:
     src: "{{ role_path }}/files/pexe.plugin.zsh"
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/pexe/pexe.plugin.zsh"
+    state: link
+
+- name: Create fzf settings directory
+  file:
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/fzf-settings/"
+    state: directory
+
+- name: Install fzf settings plugin
+  file:
+    src: "{{ role_path }}/files/fzf-settings.plugin.zsh"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/fzf-settings/fzf-settings.plugin.zsh"
     state: link
 
 - name: Download fzf repo
