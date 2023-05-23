@@ -15,12 +15,12 @@
   become_method: sudo
   become: yes
 
-
-- name: Install python tools
+- name: Install python tools and libraries
   pip:
     executable: pip3
     name:
      - bpytop
+     - github3.py
   become_method: sudo
   become: yes
 
@@ -33,11 +33,28 @@
   become_method: sudo
   become: yes
 
-- name: Set bat color theme and make it man page viewer
+- name: Get the latest release of moar
+  community.general.github_release:
+    user: walles
+    repo: moar
+    action: latest_release
+  register: moar_release
+
+- name: Download moar {{ moar_release.tag }}
+  get_url: 
+    url: "https://github.com/walles/moar/releases/download/{{ moar_release.tag }}/moar-{{ moar_release.tag }}-linux-386"
+    dest: /usr/local/bin/moar
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  become_method: sudo
+  become: yes
+
+- name: Add tool settings to .profile
   lineinfile:
     path: "{{ ansible_env.HOME }}/.profile"
     line: "{{ item }}"
   with_items:    
     - "export MANPAGER=\"sh -c 'col -bx | bat -l man -p'\""
     - "export BAT_THEME=\"Visual Studio Dark+\""
-  
+    - "export PAGER=/usr/local/bin/moar"
