@@ -51,10 +51,10 @@
   become: yes
 
 - name: Add tool settings to .profile
-  lineinfile:
+  blockinfile:
     path: "{{ ansible_env.HOME }}/.profile"
-    line: "{{ item }}"
-  with_items:    
-    - "export MANPAGER=\"sh -c 'col -bx | bat -l man -p'\""
-    - "export BAT_THEME=\"Visual Studio Dark+\""
-    - "export PAGER=/usr/local/bin/moar"
+    block: |
+      export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+      export BAT_THEME="Visual Studio Dark+"
+      export PAGER=/usr/local/bin/moar
+      export BAT_PAGER='/usr/local/bin/moar -no-linenumbers'
