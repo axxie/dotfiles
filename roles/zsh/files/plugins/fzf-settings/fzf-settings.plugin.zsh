@@ -23,5 +23,12 @@ FZF_CTRL_T_OPTS="
   --preview 'bat -n --color=always {}'
   --bind 'ctrl-/:change-preview-window(down|hidden|)'
   --color header:italic
-  --header '<tab> to select, <enter> to finish, <ctrl-/> to change preview'
+  --header '<Tab> to select, <Enter> to finish, <Ctrl-/> to change preview'
+  --height 70%"
+
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window up:6:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  --color header:italic
+  --header '<Enter> to finish, <Ctrl-/> to change preview'
   --height 70%"
