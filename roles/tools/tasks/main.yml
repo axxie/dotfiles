@@ -21,6 +21,7 @@
     name:
      - bpytop
      - github3.py
+     - thefuck
   become_method: sudo
   become: yes
 
@@ -58,3 +59,4 @@
       export BAT_THEME="Visual Studio Dark+"
       export PAGER=/usr/local/bin/moar
       export BAT_PAGER='/usr/local/bin/moar -no-linenumbers'
+      eval $(thefuck --alias please)
