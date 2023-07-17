@@ -178,38 +178,20 @@
   become_method: sudo
   become: yes
 
-- name: Create docker-exec directory
-  file:
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/docker-exec/"
-    state: directory
+- name: Enumerate own oh-my-zsh plugins
+  find:
+    paths: "{{ role_path }}/files/plugins"
+    file_type: directory
+  register: own_oh_my_zsh_plugins
 
-- name: Install docker-exec completion
+- name: Install own oh-my-zsh plugins
   file:
-    src: "{{ role_path }}/files/docker-exec.plugin.zsh"
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/docker-exec/docker-exec.plugin.zsh"
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/{{ item.path|basename }}"
     state: link
-
-- name: Create pexe directory
-  file:
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/pexe/"
-    state: directory
-
-- name: Install pexe function
-  file:
-    src: "{{ role_path }}/files/pexe.plugin.zsh"
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/pexe/pexe.plugin.zsh"
-    state: link
-
-- name: Create fzf settings directory
-  file:
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/fzf-settings/"
-    state: directory
-
-- name: Install fzf settings plugin
-  file:
-    src: "{{ role_path }}/files/fzf-settings.plugin.zsh"
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/fzf-settings/fzf-settings.plugin.zsh"
-    state: link
+  loop: "{{ own_oh_my_zsh_plugins.files }}"
+  loop_control:
+    label: "{{ item.path }}"
 
 - name: Download fzf repo
   git:
