@@ -33,17 +33,31 @@ setup_color() {
 
 setup_color
 
-# The only cross-shell way to ask password
-echo -n "Enter password: "
-old_stty_cfg=$(stty -g)
-stty -echo ; PASSWORD=$(head -n 1) ; stty $old_stty_cfg
-echo ""
+if [ -f password.txt ]; then
+    # if password file is present, use it instead of asking user
+    PASSWORD=$(cat password.txt)
+    DEV_MODE=yes
+else
+    # The only cross-shell way to ask password
+    echo -n "Enter password: "
+    old_stty_cfg=$(stty -g)
+    stty -echo ; PASSWORD=$(head -n 1) ; stty $old_stty_cfg
+    echo ""
+fi
 
 # Check password and sudo
 if ! printf '%s\n' "$PASSWORD" | sudo -kS true >/dev/null 2>&1 ; then
     error "'sudo' command failed with supplied password"
     exit 1
 fi
+
+if [ -f tags.txt ]; then
+    TAGS=$(cat tags.txt)
+    DEV_MODE=yes
+else
+    TAGS=all
+fi
+
 
 OS_VERSION=$(grep -oP 'VERSION_ID="\K\d+' /etc/os-release)
 
@@ -92,13 +106,15 @@ command_exists ansible || {
     $PYTHON -m pip install --user ansible
 }
 
-
-if [ -d ~/.dotfiles ]; then
-    cd ~/.dotfiles
-    git pull
-else
-    git clone https://github.com/axxie/dotfiles.git ~/.dotfiles
-    cd ~/.dotfiles
+# If we are already in the dev dir, do not go to .dotfile and do git pull or git clone
+if [ -z "${DEV_MODE}" ]; then
+    if [ -d ~/.dotfiles ]; then
+        cd ~/.dotfiles
+        git pull
+    else
+        git clone https://github.com/axxie/dotfiles.git ~/.dotfiles
+        cd ~/.dotfiles
+    fi
 fi
 
-ansible-playbook -i hosts local_env.yml --extra-vars "ansible_sudo_pass=$PASSWORD ansible_python_interpreter=auto" 
+ansible-playbook -i hosts local_env.yml --tags "$TAGS" --extra-vars "ansible_sudo_pass=$PASSWORD ansible_python_interpreter=auto" 
