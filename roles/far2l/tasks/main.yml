@@ -28,6 +28,8 @@
         - libuchardet-dev
         - libxerces-c-dev
         - libspdlog-dev
+        - libxml2-dev
+
         state: present
       become_method: sudo
       become: yes

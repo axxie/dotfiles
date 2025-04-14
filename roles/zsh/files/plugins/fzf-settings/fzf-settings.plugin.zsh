@@ -16,8 +16,9 @@ __subdir_list() {
     -o -type d -print 2> /dev/null|cut -b3-|awk -v icon=$__icon_root '{print "\x1b[38;5;22m[\x1b[38;5;230md"++cnt"\x1b[38;5;22m]\x1b[38;5;230m "icon"  "$1}'
 }
 
-FZF_ALT_C_COMMAND='{__zshz_list; __subdir_list}'
-FZF_ALT_C_OPTS="--ansi --bind 'enter:become(echo {3})'" # get 3rd column to remove decorations
+# Disable until fixed
+#FZF_ALT_C_COMMAND='{__zshz_list; __subdir_list}'
+#FZF_ALT_C_OPTS="--ansi --bind 'enter:become(echo {3})'" # get 3rd column to remove decorations
 
 FZF_CTRL_T_OPTS="
   --preview 'bat -n --color=always {}'
