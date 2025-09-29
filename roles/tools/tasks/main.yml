@@ -37,17 +37,17 @@
   become_method: sudo
   become: yes
 
-- name: Get the latest release of moar
+- name: Get the latest release of moor
   community.general.github_release:
     user: walles
-    repo: moar
+    repo: moor
     action: latest_release
-  register: moar_release
+  register: moor_release
 
-- name: Download moar {{ moar_release.tag }}
+- name: Download moor {{ moor_release.tag }}
   get_url: 
-    url: "https://github.com/walles/moar/releases/download/{{ moar_release.tag }}/moar-{{ moar_release.tag }}-linux-386"
-    dest: /usr/local/bin/moar
+    url: "https://github.com/walles/moor/releases/download/{{ moor_release.tag }}/moor-{{ moor_release.tag }}-linux-386"
+    dest: /usr/local/bin/moor
     owner: root
     group: root
     mode: u=rwx,g=rx,o=rx
@@ -60,6 +60,6 @@
     block: |
       export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
       export BAT_THEME="Visual Studio Dark+"
-      export PAGER=/usr/local/bin/moar
-      export BAT_PAGER='/usr/local/bin/moar -no-linenumbers'
+      export PAGER=/usr/local/bin/moor
+      export BAT_PAGER='/usr/local/bin/moor -no-linenumbers'
       eval $(thefuck --alias please)
