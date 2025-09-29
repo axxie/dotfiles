@@ -63,14 +63,14 @@
 - name: Install zsh-z
   git:
     repo: https://github.com/agkozak/zsh-z.git
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-z"
+    dest: "{{ ansible_env.HOME }}/.zsh-z"
     depth: 1
 
 - name: Configure plugins in .zshrc
   replace:
     path: "{{ ansible_env.HOME }}/.zshrc"
     regexp: 'plugins=.*$'
-    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools zsh-z pexe fzf-settings fzf)'
+    replace: 'plugins=(git vagrant vagrant-prompt docker python pylint pip docker-exec zsh-syntax-highlighting zsh-navigation-tools pexe fzf)'
 
 - name: Configure .zshrc - disable warning for root
   blockinfile:
@@ -215,3 +215,11 @@
   with_items:
     - fzf
     - fzf-tmux
+
+- name: Configure zhs-z and fzf-settings in .zshenv to be usable by Alt-C in fzf
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshenv"
+    create: true
+    block: |
+      . "{{ role_path }}/files/fzf-settings/fzf-settings.plugin.zsh"
+      . "{{ ansible_env.HOME }}/.zsh-z/zsh-z.plugin.zsh"

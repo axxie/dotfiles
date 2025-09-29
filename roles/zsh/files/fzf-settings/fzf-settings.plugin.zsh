@@ -8,7 +8,7 @@ __FZF_SETTINGS_DIR="${0:A:h}"
 __icon_root=$(echo -e '\uf115')
 
 __zshz_list() {
-  z|awk '{print $2}'|tac|python3 $__FZF_SETTINGS_DIR/zshz-formatter.py
+  zshz|awk '{print $2}'|tac|python3 $__FZF_SETTINGS_DIR/zshz-formatter.py
 }
 
 __subdir_list() {
@@ -17,8 +17,8 @@ __subdir_list() {
 }
 
 # Disable until fixed
-#FZF_ALT_C_COMMAND='{__zshz_list; __subdir_list}'
-#FZF_ALT_C_OPTS="--ansi --bind 'enter:become(echo {3})'" # get 3rd column to remove decorations
+FZF_ALT_C_COMMAND='{__zshz_list; __subdir_list}'
+FZF_ALT_C_OPTS="--ansi --bind 'enter:become(echo {3})'" # get 3rd column to remove decorations
 
 FZF_CTRL_T_OPTS="
   --preview 'bat -n --color=always {}'
