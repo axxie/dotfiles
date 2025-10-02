@@ -6,6 +6,7 @@
     cursor_color = "#aaaaaa"
     font = FiraCode Nerd Font Regular 11
     scrollback_infinite = True
+    palette = "#2e3436:#cc0000:#4e9a06:#c4a000:#0037da:#881798:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#3b78ff:#b4009e:#34e2e2:#eeeeec"
     use_system_font = False
 [layouts]
   [[default]]
