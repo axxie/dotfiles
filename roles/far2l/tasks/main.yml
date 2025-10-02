@@ -127,6 +127,7 @@
   template:
     src: ./templates/bookmarks.ini
     dest: "{{ ansible_env.HOME }}/.config/far2l/settings/bookmarks.ini"
+    force: false
 
 - name: Link colorer scheme
   file:
