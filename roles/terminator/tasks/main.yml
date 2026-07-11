@@ -1,7 +1,14 @@
+
+- name: Detect desktop environment
+  import_role:
+    name: common
+    tasks_from: detect-desktop.yml
+
 - name: Install terminator
   package: name=terminator state=present
   become_method: sudo
   become: yes
+  when: is_desktop
 
 - name: Install font
   copy:
@@ -9,6 +16,7 @@
     dest: /usr/local/share/fonts/
   become_method: sudo
   become: yes
+  when: is_desktop
 
 - name: Refresh font cache
   import_role: 
@@ -16,6 +24,7 @@
     tasks_from: font-cache.yml
   vars:
     font: FiraCode Nerd Font Regular
+  when: is_desktop
 
 - block:
   - name: Make sure path exists
@@ -29,8 +38,9 @@
       state: link
   vars:
     conf_path: "{{ ansible_env.HOME }}/.config/terminator"
-
+  when: is_desktop
 
 - name: Add terminator to Gnome Favorites (Dock)
   gnome_favorites.py:
     app: 'terminator.desktop'
+  when: is_desktop

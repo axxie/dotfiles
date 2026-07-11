@@ -1,13 +1,47 @@
-- name: Add far2l ppa
-  apt_repository:
-    repo: ppa:far2l-team/ppa
+- name: Detect desktop environment
+  import_role:
+    name: common
+    tasks_from: detect-desktop.yml
+
+- name: Install python3-debian (required by deb822_repository)
+  package:
+    name: python3-debian
+    state: present
   when: ansible_os_family == 'Debian'
+  become_method: sudo
+  become: yes
+
+- name: Look up far2l ppa signing key fingerprint
+  uri:
+    url: https://api.launchpad.net/devel/~far2l-team/+archive/ubuntu/ppa
+    headers:
+      Accept: application/json
+  register: far2l_ppa_info
+  when: ansible_os_family == 'Debian'
+
+- name: Add far2l ppa
+  deb822_repository:
+    name: far2l-team-ppa
+    types: deb
+    uris: https://ppa.launchpadcontent.net/far2l-team/ppa/ubuntu
+    suites: "{{ ansible_distribution_release }}"
+    components: main
+    signed_by: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x{{ far2l_ppa_info.json.signing_key_fingerprint }}"
+  when: ansible_os_family == 'Debian'
+  become_method: sudo
+  become: yes
+  register: far2l_ppa
+
+- name: Update apt cache after adding far2l ppa
+  apt:
+    update_cache: yes
+  when: far2l_ppa is changed
   become_method: sudo
   become: yes
 
 - name: Install far2l
   package:
-    name: far2l
+    name: "{{ 'far2l-gui' if is_desktop else 'far2l' }}"
     state: present
   when: ansible_os_family == 'Debian'
   become_method: sudo
@@ -86,6 +120,7 @@
 - name: Add far to Gnome Favorites (Dock)
   gnome_favorites.py:
     app: 'far2l.desktop'
+  when: is_desktop
 
 - name: Install font
   copy:
@@ -93,13 +128,15 @@
     dest: /usr/local/share/fonts/
   become_method: sudo
   become: yes
+  when: is_desktop
 
 - name: Refresh font cache
-  import_role: 
+  import_role:
     name: common
     tasks_from: font-cache.yml
   vars:
     font: TerminalVector
+  when: is_desktop
 
 - name: Ensure configure dirs are present
   file:
@@ -154,6 +191,7 @@
     path: org.gnome.desktop.wm.keybindings
     key: "{{ item }}"
     value: "['disabled']"
+  when: is_desktop
   with_items:
     - panel-main-menu
     - panel-run-dialog

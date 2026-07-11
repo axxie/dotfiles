@@ -58,13 +58,10 @@ else
     TAGS=all
 fi
 
-
-OS_VERSION=$(grep -oP 'VERSION_ID="\K\d+' /etc/os-release)
-
-if [ $OS_VERSION -lt 16 ]; then
-    PYTHON=python
-else
+if command_exists python3; then
     PYTHON=python3
+else
+    PYTHON=python
 fi
 
 for command in wget $PYTHON git
@@ -75,54 +72,20 @@ do
     }
 done
 
-
-if [ $OS_VERSION -ge 23 ]; then
-    command_exists "pipx" || {
-        error "Required command \"pipx\" is not installed"
-        error "Install using \"sudo apt install pipx\" command"
-        missing_requirement=yes
-    }
-fi
-
-
 if [ -n "$missing_requirement" ]; then
     exit 1
 fi
 
 echo Bootstrapping...
 
+command_exists "pipx" || {
+    echo "Installing pipx"
+    sudo -S apt-get install -y pipx
+}
 
-if [ $OS_VERSION -ge 23 ]; then
-    command_exists ansible || {
-        pipx install ansible --include-deps
-    }
-else
-
-    # For Ubuntu 18 python3-distutils must be installed to be able to use pip from python3
-    if [ $OS_VERSION -ge 18 ]; then
-        $PYTHON -c "import distutils.util" >/dev/null 2>&1 || {
-            echo "Installing python3-distutils..."
-            printf '%s\n' "$PASSWORD" | sudo -S apt-get install -y python3-distutils
-        }
-    fi
-
-
-    $PYTHON -c "import pip" >/dev/null 2>&1 || {
-        python_version=$($PYTHON -V 2>&1 | sed 's/.* \([0-9]\).\([0-9]\).*/\1\2/')
-        if [ "$python_version" -lt "30" ]; then
-            wget -q https://bootstrap.pypa.io/pip/2.7/get-pip.py -O- | $PYTHON - --user
-        elif [ "$python_version" -lt "37" ]; then
-            wget -q https://bootstrap.pypa.io/pip/3.6/get-pip.py -O- | $PYTHON - --user
-        else
-            wget -q https://bootstrap.pypa.io/get-pip.py -O- | $PYTHON - --user
-        fi
-    }
-
-    command_exists ansible || {
-        # install ansible
-        $PYTHON -m pip install --user ansible
-    }
-fi
+command_exists ansible || {
+    pipx install ansible --include-deps
+}
 
 # If we are already in the dev dir, do not go to .dotfile and do git pull or git clone
 if [ -z "${DEV_MODE}" ]; then

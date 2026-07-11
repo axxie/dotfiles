@@ -21,9 +21,9 @@
   pip:
     executable: pip3
     name:
-     - bpytop
      - github3.py
      - git+https://github.com/DL909/thefuck.git
+    break_system_packages: true
   become_method: sudo
   become: yes
 

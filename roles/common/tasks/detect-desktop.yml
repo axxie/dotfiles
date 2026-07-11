@@ -1,0 +1,9 @@
+- name: Gather installed package facts
+  package_facts:
+    manager: apt
+  when: is_desktop is not defined
+
+- name: Determine if this is a desktop (GUI) system
+  set_fact:
+    is_desktop: "{{ (ansible_facts.packages.keys() | select('match', '^(ubuntu-desktop|gnome-shell)') | list | length) > 0 }}"
+  when: is_desktop is not defined
